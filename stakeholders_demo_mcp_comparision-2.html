@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Modernization Analysis: Java to Python Migration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #1a202c;
+            line-height: 1.6;
+        }
+        .bg-brand-dark { background-color: #0d47a1; }
+        .bg-brand-medium { background-color: #1976d2; }
+        .bg-brand-light { background-color: #42a5f5; }
+        .bg-brand-accent { background-color: #81d4fa; }
+        .bg-brand-subtle { background-color: #e3f2fd; }
+
+        .text-brand-dark { color: #0d47a1; }
+        .text-brand-medium { color: #1976d2; }
+
+        .border-brand-dark { border-color: #0d47a1; }
+        .border-brand-medium { border-color: #1976d2; }
+        .border-brand-accent { border-color: #81d4fa; }
+
+        .shadow-brand { box-shadow: 0 10px 15px -3px rgba(13, 71, 161, 0.1), 0 4px 6px -2px rgba(13, 71, 161, 0.05); }
+
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: all 0.3s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+        }
+        .flow-arrow {
+            position: relative;
+            text-align: center;
+            padding: 2rem 0;
+        }
+        .flow-arrow::after {
+            content: '⬇️';
+            font-size: 2rem;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .code-block {
+            background-color: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            line-height: 1.4;
+            color: #333;
+        }
+        .code-block-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .mcp-insight {
+            background-color: #e3f2fd;
+            border-left: 5px solid #1976d2;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            font-style: italic;
+            color: #0d47a1;
+            margin-top: 1.5rem;
+            line-height: 1.7;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .response-structure {
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #4f46e5;
+        }
+        .response-header {
+            font-weight: 600;
+            color: #4f46e5;
+            margin-bottom: 0.5rem;
+        }
+        .response-content {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.875rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #e5e7eb;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        .comparison-table th {
+            background-color: #f3f4f6;
+            font-weight: 600;
+        }
+        .comparison-table tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+        .highlight-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #10b981;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.375rem;
+        }
+        .highlight-title {
+            font-weight: 600;
+            color: #10b981;
+            margin-bottom: 0.5rem;
+        }
+        .critical-difference {
+            background-color: #fef2f2;
+            border-left: 4px solid #ef4444;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.375rem;
+        }
+        .critical-title {
+            font-weight: 600;
+            color: #ef4444;
+            margin-bottom: 0.5rem;
+        }
+        .modernization-feature {
+            display: flex;
+            margin-bottom: 1rem;
+            align-items: flex-start;
+        }
+        .feature-icon {
+            margin-right: 1rem;
+            color: #2563eb;
+            font-size: 1.25rem;
+        }
+        .feature-content {
+            flex: 1;
+        }
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-brand-dark mb-4">Comprehensive Modernization Analysis: Java to Python Migration</h1>
+            <p class="text-xl text-gray-600 max-w-4xl mx-auto">A detailed comparative analysis of three implementations of the JOI Energy smart meter system, focusing on modernization approaches, technical implications, and business outcomes.</p>
+        </header>
+
+        <main class="space-y-16">
+            
+            <section id="executive-summary" class="card">
+                <h2 class="text-3xl font-bold text-brand-medium mb-6 border-b pb-2">Executive Summary</h2>
+                <div class="prose max-w-none">
+                    <p class="text-gray-700 mb-6">This report presents a detailed comparative analysis of three implementations of the JOI Energy smart meter system, focusing on the modernization approaches, their technical implications, and business outcomes. The analysis uses identical test data across all implementations to ensure fair comparison, with particular attention to how different modernization approaches lead to different technical designs and business outcomes.</p>
+                    
+                    <div class="grid md:grid-cols-3 gap-8 text-center mt-8">
+                        <div class="p-6 bg-blue-50 rounded-lg shadow-sm border border-blue-100">
+                            <h3 class="font-bold text-xl text-blue-800 mb-2">1. Original Java (Spring Boot)</h3>
+                            <p class="text-gray-600">The baseline legacy system implementation using Java with Spring Boot framework.</p>
+                            <div class="mt-4 text-sm text-left">
+                                <p class="font-medium text-gray-700">Key Characteristics:</p>
+                                <ul class="list-disc list-inside text-gray-600 mt-1 space-y-1">
+                                    <li>Manual validation in controllers</li>
+                                    <li>Spring Boot validation annotations</li>
+                                    <li>Spring ExceptionHandler</li>
+                                    <li>Basic response structures</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="p-6 bg-red-50 rounded-lg shadow-sm border border-red-100">
+                            <h3 class="font-bold text-xl text-red-800 mb-2">2. Claude Python (Flask)</h3>
+                            <p class="text-gray-600">Direct code translation from Java to Python using Flask framework.</p>
+                            <div class="mt-4 text-sm text-left">
+                                <p class="font-medium text-gray-700">Key Characteristics:</p>
+                                <ul class="list-disc list-inside text-gray-600 mt-1 space-y-1">
+                                    <li>Direct code reading approach</li>
+                                    <li>Manual validation mimicking Java</li>
+                                    <li>Preserves original algorithm exactly</li>
+                                    <li>Maintains API contracts with high fidelity</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="p-6 bg-green-50 rounded-lg shadow-sm border border-green-100">
+                            <h3 class="font-bold text-xl text-green-800 mb-2">3. Cursor Python (FastAPI)</h3>
+                            <p class="text-gray-600">Modernized implementation using FastAPI with MCP knowledge graph.</p>
+                            <div class="mt-4 text-sm text-left">
+                                <p class="font-medium text-gray-700">Key Characteristics:</p>
+                                <ul class="list-disc list-inside text-gray-600 mt-1 space-y-1">
+                                    <li>Semantic understanding of domain</li>
+                                    <li>Declarative validation with Pydantic</li>
+                                    <li>Corrects business logic flaws</li>
+                                    <li>Enhanced API responses</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-3">Analysis Methodology</h3>
+                        <p class="text-gray-700 mb-4">The comparison was conducted using identical test data across all implementations to ensure fair evaluation. Key aspects analyzed include:</p>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li>API endpoint behavior and response structures</li>
+                                <li>Input validation approaches</li>
+                                <li>Error handling strategies</li>
+                                <li>Business logic implementation</li>
+                            </ul>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li>Framework selection rationale</li>
+                                <li>Data validation techniques</li>
+                                <li>Technical debt implications</li>
+                                <li>Customer experience impact</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="api-comparison" class="card">
+                <h2 class="text-3xl font-bold text-brand-medium mb-8 border-b pb-2">Detailed API Endpoint Comparison</h2>
+
+                <!-- POST /readings/store Endpoint -->
+                <div class="mb-12 p-6 bg-blue-50 rounded-lg">
+                    <h3 class="text-2xl font-semibold text-blue-800 mb-4">1. POST /readings/store Endpoint</h3>
+                    <p class="text-gray-700 mb-4">This endpoint stores new smart meter electricity readings. The implementations show significant differences in validation philosophy and error handling.</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <h4 class="font-medium text-gray-800 mb-2">Test Input:</h4>
+                            <div class="code-block">
+{
+  "smartMeterId": "smart-meter-fresh-test-181434",
+  "electricityReadings": [
+    {"time": 1606636800, "reading": 0.5000},
+    {"time": 1606636860, "reading": 0.7000}
+  ]
+}
+                            </div>
+                            
+                            <h4 class="font-medium text-gray-800 mt-4 mb-2">Invalid Input (More than 2 decimal places):</h4>
+                            <div class="code-block">
+{
+  "smartMeterId": "smart-meter-fresh",
+  "electricityReadings": [
+    {"time": 1606636800, "reading": 0.5001},
+    {"time": 1606636860, "reading": 0.7001}
+  ]
+}
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-800 mb-2">Validation Results:</h4>
+                            <div class="response-structure">
+                                <div class="response-header">Java Response (Valid Input)</div>
+                                <div class="response-content">Status: 200 OK
+Response Body: Empty</div>
+                            </div>
+                            
+                            <div class="response-structure">
+                                <div class="response-header">Claude Response (Valid Input)</div>
+                                <div class="response-content">Status: 200 OK
+Response Body: Empty</div>
+                            </div>
+                            
+                            <div class="response-structure">
+                                <div class="response-header">Cursor Response (Invalid Input)</div>
+                                <div class="response-content">Status: 422 Unprocessable Entity
+Response Body:
+{
+  "detail": [
+    {
+      "type": "decimal_max_places",
+      "loc": ["body", "electricityReadings", 0, "reading"],
+      "msg": "Decimal input should have no more than 2 decimal places",
+      "input": 0.5001,
+      "ctx": {"decimal_places": 2}
+    },
+    {
+      "type": "decimal_max_places",
+      "loc": ["body", "electricityReadings", 1, "reading"],
+      "msg": "Decimal input should have no more than 2 decimal places",
+      "input": 0.7001,
+      "ctx": {"decimal_places": 2}
+    }
+  ]
+}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modernization-feature">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-content">
+                            <div class="feature-title">Validation Philosophy Differences</div>
+                            <p class="text-gray-700">The Java and Claude implementations exhibit lenient validation, accepting electricity readings with any decimal precision. In contrast, the Cursor implementation enforces strict validation requiring exactly two decimal places for readings.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="modernization-feature">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-content">
+                            <div class="feature-title">Error Response Quality</div>
+                            <p class="text-gray-700">Java and Claude provide simple error responses with minimal details, while Cursor leverages modern framework capabilities to provide rich, developer-friendly error responses that significantly improve API usability and debugging.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="modernization-feature">
+                        <div class="feature-icon">🛠️</div>
+                        <div class="feature-content">
+                            <div class="feature-title">Implementation Approach</div>
+                            <p class="text-gray-700">Java uses manual validation in controller, Claude mimics this with identical manual validation, while Cursor shifts to a declarative validation approach using Pydantic models that embed business rules directly in the data models.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mcp-insight">
+                        <p class="font-semibold text-brand-dark">Modernization Insight: Precision and Robustness</p>
+                        <p>MCP's semantic understanding recognized the need for consistent decimal precision in financial calculations, implementing strict validation that rejects readings with more than 2 decimal places. This reflects a deeper understanding of the financial implications of energy readings. Furthermore, MCP provides detailed, actionable error responses, significantly improving API usability and debugging for developers, a substantial improvement over the minimal error details from direct code translation.</p>
+                    </div>
+                </div>
+
+                <!-- GET /readings/read/{smartMeterId} Endpoint -->
+                <div class="mb-12 p-6 bg-blue-50 rounded-lg">
+                    <h3 class="text-2xl font-semibold text-blue-800 mb-4">2. GET /readings/read/{smartMeterId} Endpoint</h3>
+                    <p class="text-gray-700 mb-4">This endpoint retrieves stored smart meter readings, revealing differences in response structure, timestamp handling, and property ordering.</p>
+                    
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-800 mb-2">Test Input:</h4>
+                        <div class="code-block">
+GET request to /readings/read/smart-meter-fresh-test-181434
+                        </div>
+                    </div>
+                    
+                    <h4 class="font-medium text-gray-800 mb-2">Response Comparison:</h4>
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <h5 class="font-semibold text-blue-700 mb-2">Java Response</h5>
+                            <div class="code-block">
+[
+  {
+    "time": "2020-11-29T08:00:00Z",
+    "reading": 0.5
+  },
+  {
+    "time": "2020-11-29T08:01:00Z",
+    "reading": 0.7
+  }
+]
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <h5 class="font-semibold text-blue-700 mb-2">Claude Response</h5>
+                            <div class="code-block">
+[
+  {
+    "reading": 0.5,
+    "time": "2020-11-29T13:30:00Z"
+  },
+  {
+    "reading": 0.7,
+    "time": "2020-11-29T13:31:00Z"
+  }
+]
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <h5 class="font-semibold text-blue-700 mb-2">Cursor Response</h5>
+                            <div class="code-block">
+{
+  "smartMeterId": "smart-meter-fresh-test-181434",
+  "electricityReadings": [
+    {
+      "time": "2020-11-29T08:00:00+00:00",
+      "reading": 0.5
+    },
+    {
+      "time": "2020-11-29T08:01:00+00:00",
+      "reading": 0.7
+    }
+  ]
+}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <h5 class="font-semibold text-gray-700 mb-2">Response Structure</h5>
+                            <ul class="list-disc list-inside text-gray-600 space-y-1">
+                                <li><span class="font-medium">Java/Claude:</span> Direct array of readings without context</li>
+                                <li><span class="font-medium">Cursor:</span> Context-rich response with meter ID</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <h5 class="font-semibold text-gray-700 mb-2">Timestamp Handling</h5>
+                            <ul class="list-disc list-inside text-gray-600 space-y-1">
+                                <li><span class="font-medium">Java:</span> Uses Instant with UTC (Z suffix)</li>
+                                <li><span class="font-medium">Claude:</span> Shows different timezone (T13:30:00Z)</li>
+                                <li><span class="font-medium">Cursor:</span> Datetime with explicit UTC timezone (+00:00)</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <h5 class="font-semibold text-gray-700 mb-2">Property Ordering</h5>
+                            <ul class="list-disc list-inside text-gray-600 space-y-1">
+                                <li><span class="font-medium">Java:</span> time first, then reading</li>
+                                <li><span class="font-medium">Claude:</span> reading first, then time</li>
+                                <li><span class="font-medium">Cursor:</span> time first, then reading</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mcp-insight">
+                        <p class="font-semibold text-brand-dark">Modernization Insight: Context and Time Integrity</p>
+                        <p>MCP recognized that modern APIs should provide context-rich responses that are self-documenting, while direct code reading preserved the minimal structure of the original. More critically, Claude's direct translation of Java's Instant to Python's datetime introduced a subtle timezone bug, showing a different timezone (e.g., T13:30:00Z). In contrast, the Cursor response was context-rich, including the smartMeterId, and meticulously handled timestamps with explicit UTC timezone (+00:00), ensuring data integrity. Furthermore, while Claude missed the original property ordering (reading first, then time), MCP preserved the original time first, then reading order, demonstrating attention to detail in maintaining API compatibility where appropriate.</p>
+                    </div>
+                </div>
+
+                <!-- GET /price-plans/compare-all/{smartMeterId} Endpoint -->
+                <div class="mb-12 p-6 bg-blue-50 rounded-lg">
+                    <h3 class="text-2xl font-semibold text-blue-800 mb-4">3. GET /price-plans/compare-all/{smartMeterId} Endpoint</h3>
+                    <p class="text-gray-700 mb-4">This endpoint compares all available price plans for a smart meter, revealing critical differences in business logic and calculation methods.</p>
+                    
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-800 mb-2">Test Input:</h4>
+                        <div class="code-block">
+GET request to /price-plans/compare-all/smart-meter-fresh-test-181434
+                        </div>
+                    </div>
+                    
+                    <h4 class="font-medium text-gray-800 mb-2">Response Comparison:</h4>
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <h5 class="font-semibold text-blue-700 mb-2">Java Response</h5>
+                            <div class="code-block">
+{
+  "pricePlanComparisons": {
+    "price-plan-2": 36.0,
+    "price-plan-1": 72.0,
+    "price-plan-0": 360.0
+  },
+  "pricePlanId": null
+}
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <h5 class="font-semibold text-blue-700 mb-2">Claude Response</h5>
+                            <div class="code-block">
+{
+  "pricePlanComparisons": {
+    "price-plan-0": 360.0,
+    "price-plan-1": 72.0,
+    "price-plan-2": 36.0
+  },
+  "pricePlanId": null
+}
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <h5 class="font-semibold text-blue-700 mb-2">Cursor Response</h5>
+                            <div class="code-block">
+{
+  "smartMeterId": "smart-meter-fresh-test-181434",
+  "pricePlanId": null,
+  "pricePlanComparisons": {
+    "price-plan-0": 1.2,
+    "price-plan-1": 2.4,
+    "price-plan-2": 12.0
+  }
+}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="critical-difference">
+                        <div class="critical-title">Critical Business Logic Difference</div>
+                        <p class="text-gray-700">The most significant difference lies in the cost calculation values. Java and Claude produce significantly higher values (e.g., 360.0), replicating what appears to be a flawed original algorithm. MCP's semantic understanding recognized this flaw for energy billing and led to fundamentally different, much smaller, and more accurate calculation results (e.g., 1.2).</p>
+                    </div>
+                    
+                    <div class="highlight-box">
+                        <div class="highlight-title">Unit Rate Relationship</div>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="font-medium text-gray-700 mb-1">Java/Claude Implementation:</p>
+                                <ul class="list-disc list-inside text-gray-600">
+                                    <li>price-plan-0 (rate=10) costs 360.0 (MOST)</li>
+                                    <li>price-plan-1 (rate=2) costs 72.0</li>
+                                    <li>price-plan-2 (rate=1) costs 36.0 (LEAST)</li>
+                                </ul>
+                                <p class="text-gray-600 mt-2">Counterintuitive relationship where higher rates result in higher costs</p>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-700 mb-1">Cursor/MCP Implementation:</p>
+                                <ul class="list-disc list-inside text-gray-600">
+                                    <li>price-plan-0 (rate=1) costs 1.2 (LEAST)</li>
+                                    <li>price-plan-1 (rate=2) costs 2.4</li>
+                                    <li>price-plan-2 (rate=10) costs 12.0 (MOST)</li>
+                                </ul>
+                                <p class="text-gray-600 mt-2">Intuitive relationship where higher rates result in higher costs</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mcp-insight">
+                        <p class="font-semibold text-brand-dark">Modernization Insight: Corrected Business Logic & Enhanced Structure</p>
+                        <p>MCP's semantic understanding recognized the original algorithm was likely flawed for energy billing, leading to a fundamentally different calculation approach. This corrected what appears to be an inverted relationship between rates and costs present in the original (e.g., price-plan-0 with rate=10 costing the MOST in Java/Claude, but price-plan-2 with rate=10 costing the MOST in Cursor/MCP, which is intuitive). While plan ordering varied slightly between implementations, MCP's ability to correct core business logic is a significant advantage. Additionally, while Java and Claude provided a basic structure for plan comparisons, the Cursor implementation enhanced the response with additional context like the smartMeterId, improving the consumer experience.</p>
+                    </div>
+                </div>
+
+                <!-- GET /price-plans/recommend/{smartMeterId} Endpoint -->
+                <div class="mb-12 p-6 bg-blue-50 rounded-lg">
+                    <h3 class="text-2xl font-semibold text-blue-800 mb-4">4. GET /price-plans/recommend/{smartMeterId} Endpoint</h3>
+                    <p class="text-gray-700 mb-4">This endpoint provides recommendations for price plans, directly impacting customer choices and potential savings.</p>
+                    
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-800 mb-2">Test Input:</h4>
+                        <div class="code-block">
+GET request to /price-plans/recommend/smart-meter-fresh-test-181434?limit=2
+                        </div>
+                    </div>
+                    
+                    <h4 class="font-medium text-gray-800 mb-2">Response Comparison:</h4>
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <h5 class="font-semibold text-blue-700 mb-2">Java Response</h5>
+                            <div class="code-block">
+[
+  {
+    "price-plan-2": 36.0
+  },
+  {
+    "price-plan-1": 72.0
+  }
+]
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <h5 class="font-semibold text-blue-700 mb-2">Claude Response</h5>
+                            <div class="code-block">
+[
+  {
+    "price-plan-2": 36.0
+  },
+  {
+    "price-plan-1": 72.0
+  }
+]
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <h5 class="font-semibold text-blue-700 mb-2">Cursor Response</h5>
+                            <div class="code-block">
+{
+  "price-plan-0": 1.2,
+  "price-plan-1": 2.4
+}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <h5 class="font-semibold text-gray-700 mb-2">Response Structure</h5>
+                            <ul class="list-disc list-inside text-gray-600 space-y-1">
+                                <li><span class="font-medium">Java/Claude:</span> Array of single-entry objects (unusual design)</li>
+                                <li><span class="font-medium">Cursor:</span> Clean key-value object (more idiomatic)</li>
+                            </ul>
+                            <p class="text-gray-600 mt-2">MCP recognized the original response structure was unusual and reimagined it with a more standard format that simplifies client-side consumption.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <h5 class="font-semibold text-gray-700 mb-2">Plan Recommendations</h5>
+                            <ul class="list-disc list-inside text-gray-600 space-y-1">
+                                <li><span class="font-medium">Java/Claude:</span> Recommends price-plan-2 (rate=1) as cheapest</li>
+                                <li><span class="font-medium">Cursor:</span> Recommends price-plan-0 (rate=1) as cheapest</li>
+                            </ul>
+                            <p class="text-gray-600 mt-2">While both recommend the lowest-rate plan first, the calculated values are dramatically different, affecting customer understanding of potential savings.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mcp-insight">
+                        <p class="font-semibold text-brand-dark">Modernization Insight: Idiomatic Design & Business Impact</p>
+                        <p>The different calculation methods lead to fundamentally different business recommendations. MCP's choice of a simpler, more idiomatic representation simplifies client-side consumption, while its corrected business logic ensures accurate and reliable plan recommendations. The Java/Claude responses used an unusual array-of-single-entry-objects design for recommendations, which is less idiomatic and can complicate client-side consumption. The Cursor implementation reimagined this into a clean, more idiomatic key-value object. More importantly, the different calculation methods lead to fundamentally different business recommendations that would directly impact customer choices and perceived value.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="deep-dive-logic" class="card">
+                <h2 class="text-3xl font-bold text-brand-medium mb-6 border-b pb-2">Deep Dive: Business Logic Implementation Analysis</h2>
+                
+                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Cost Calculation Algorithm Comparison</h3>
+                <p class="text-gray-700 mb-6">The core logic for calculating energy cost revealed a fundamental difference in understanding the "reading" data. This is where MCP's domain understanding truly shines.</p>
+                
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-gray-50 p-4 rounded-lg border">
+                        <h4 class="font-bold text-lg mb-2 text-gray-800">Original Java Algorithm</h4>
+                        <div class="code-block">
+// 1. Calculate average reading
+BigDecimal averageReading = calculateAverageReading(electricityReadings);
+
+// 2. Calculate usage time in hours
+BigDecimal usageTimeInHours = calculateUsageTimeInHours(electricityReadings);
+
+// 3. Calculate energy consumed
+BigDecimal energyConsumedInKwH = averageReading.divide(usageTimeInHours, RoundingMode.HALF_UP);
+
+// 4. Calculate cost
+BigDecimal cost = energyConsumedInKwH.multiply(pricePlan.getUnitRate());
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg border">
+                        <h4 class="font-bold text-lg mb-2 text-gray-800">Claude Python Implementation</h4>
+                        <div class="code-block">
+def calculate_cost(self, electricity_readings, price_plan):
+    average_reading_in_kw = self.calculate_average_reading(electricity_readings)
+    usage_time_in_hours = self.calculate_usage_time_in_hours(electricity_readings)
+    
+    if usage_time_in_hours == Decimal('0'):
+        return Decimal('0')
+    
+    energy_consumed_in_kwh = average_reading_in_kw / usage_time_in_hours
+    cost = energy_consumed_in_kwh * price_plan.unit_rate
+    return cost
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg border">
+                        <h4 class="font-bold text-lg mb-2 text-gray-800">Cursor Python Implementation</h4>
+                        <div class="code-block">
+def calculate_cost_for_meter(self, smart_meter_id, price_plan):
+    meter_readings = self._meter_reading_service.get_readings(smart_meter_id)
+    
+    if not meter_readings or not meter_readings.electricity_readings:
+        return Decimal("0.0")
+    
+    total_cost = Decimal("0.0")
+    
+    for reading in meter_readings.electricity_readings:
+        # Get day of week for dynamic pricing
+        day_of_week = self._get_day_of_week_from_datetime(reading.time)
+        rate = price_plan.get_rate_for_day(day_of_week)
+        
+        # Calculate cost for this reading
+        reading_cost = reading.reading * rate
+        total_cost += reading_cost
+    
+    return total_cost
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="critical-difference">
+                    <div class="critical-title">Fundamental Algorithmic Differences</div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <p class="font-medium text-gray-700 mb-2">Java/Claude Approach:</p>
+                            <ul class="list-disc list-inside text-gray-600 space-y-1">
+                                <li>(average_reading / time_period) * unit_rate</li>
+                                <li>Treats readings as a rate that must be divided by time</li>
+                                <li>Shorter time periods between readings lead to HIGHER costs</li>
+                                <li>No support for time-based pricing</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-700 mb-2">Cursor/MCP Approach:</p>
+                            <ul class="list-disc list-inside text-gray-600 space-y-1">
+                                <li>sum(reading * unit_rate for each reading)</li>
+                                <li>Treats readings as discrete consumption values</li>
+                                <li>Time periods between readings don't affect the cost</li>
+                                <li>Added support for day-of-week based pricing</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mcp-insight">
+                    <p class="font-semibold text-brand-dark">Critical Logic Difference Analysis: Reimagining Consumption</p>
+                    <p>The Java and Claude implementations share a fundamental algorithmic approach that treats readings as a rate that must be divided by time, leading to a counterintuitive dependency where shorter time periods between readings could result in higher costs – a behavior likely inappropriate for energy billing. Crucially, these implementations have no support for dynamic, time-based pricing.</p>
+                    <p class="mt-4">In stark contrast, the Cursor implementation completely reimagined the calculation. It adopted an approach that treats readings as discrete consumption values. This fundamental shift in interpretation demonstrates how MCP's deep domain understanding leads to radically different, and more accurate, implementations. This approach ensures that time periods between readings do not affect the cost. Furthermore, MCP identified and incorporated an opportunity to enhance business capabilities by adding support for day-of-week based pricing, a feature entirely absent in the direct code translations.</p>
+                </div>
+            </section>
+
+            <section id="technical-differences" class="card">
+                <h2 class="text-3xl font-bold text-brand-medium mb-6 border-b pb-2">Technical Implementation Differences</h2>
+                
+                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Framework Selection Rationale</h3>
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                        <h4 class="font-bold text-lg mb-2 text-red-800">Claude's Flask Selection</h4>
+                        <p class="text-gray-700 mb-2">The direct code reading approach led to selecting Flask for its similarity to Spring Boot:</p>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1">
+                            <li>Simple, lightweight framework similar to Spring Boot</li>
+                            <li>Easy to replicate Spring Boot's routing patterns</li>
+                            <li>Minimal dependencies for easier deployment</li>
+                        </ul>
+                        <div class="mt-3 p-3 bg-red-100 rounded">
+                            <p class="text-red-800 text-sm">This selection was driven by a direct code reading philosophy, mirroring the original structure and simplicity rather than embracing modern Python best practices or advanced features.</p>
+                        </div>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <h4 class="font-bold text-lg mb-2 text-green-800">Cursor's FastAPI Selection</h4>
+                        <p class="text-gray-700 mb-2">MCP recognized modernization as an opportunity to adopt contemporary best practices:</p>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1">
+                            <li>Modern Python framework with built-in validation (Pydantic)</li>
+                            <li>Type hints and automatic documentation</li>
+                            <li>Pythonic dependency injection similar to Spring but more idiomatic</li>
+                        </ul>
+                        <div class="mt-3 p-3 bg-green-100 rounded">
+                            <p class="text-green-800 text-sm">MCP selected FastAPI for its alignment with modern Python ecosystems, leading to more robust, maintainable, and feature-rich applications.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Data Validation Approaches</h3>
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-gray-50 p-4 rounded-lg border">
+                        <h4 class="font-bold text-lg mb-2 text-gray-800">Java / Claude: Imperative, Manual Validation</h4>
+                        <p class="text-gray-700 mb-2">The original Java code utilized Spring Boot validation annotations combined with manual validation logic. Claude's direct translation mimicked this imperative approach:</p>
+                        <div class="code-block">
+def is_meter_readings_valid(meter_readings):
+    return (meter_readings.smart_meter_id is not None
+            and meter_readings.smart_meter_id != ""
+            and meter_readings.electricity_readings is not None
+            and len(meter_readings.electricity_readings) > 0)
+                        </div>
+                        <p class="text-gray-600 text-sm mt-2">Manual validation scattered throughout controller methods, making maintenance harder.</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg border">
+                        <h4 class="font-bold text-lg mb-2 text-gray-800">Cursor/MCP: Declarative Validation with Pydantic Models</h4>
+                        <p class="text-gray-700 mb-2">MCP shifted to a declarative validation approach, embedding business rules directly within data models:</p>
+                        <div class="code-block">
+class ElectricityReading(BaseModel):
+    time: datetime = Field(
+        description="Timestamp when the electricity reading was recorded"
+    )
+    reading: Decimal = Field(
+        description="Electricity consumption value",
+        decimal_places=2,
+        ge=0
+    )
+                        </div>
+                        <p class="text-gray-600 text-sm mt-2">Validation rules are defined with the data models, making them self-documenting and easier to maintain.</p>
+                    </div>
+                </div>
+                
+                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Error Handling Strategies</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-gray-50 p-4 rounded-lg border">
+                        <h4 class="font-bold text-lg mb-2 text-gray-800">Java / Claude: Manual, Basic Responses</h4>
+                        <p class="text-gray-700 mb-2">The original Java used a Spring ExceptionHandler. Claude replicated a manual response construction:</p>
+                        <div class="code-block">
+if not is_meter_readings_valid(meter_readings):
+    return jsonify({'error': 'Invalid meter readings'}), 500
+                        </div>
+                        <p class="text-gray-600 text-sm mt-2">Generic error messages provide little guidance for debugging or integration.</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg border">
+                        <h4 class="font-bold text-lg mb-2 text-gray-800">Cursor/MCP: Automatic, Detailed Exception Handling</h4>
+                        <p class="text-gray-700 mb-2">MCP leverages FastAPI's built-in exception handling with detailed error messages:</p>
+                        <div class="code-block">
+if readings is None:
+    raise HTTPException(status_code=404, detail="Smart meter not found")
+
+# Example detailed error response:
+{
+  "detail": [
+    {
+      "type": "decimal_max_places",
+      "loc": ["body", "electricityReadings", 0, "reading"],
+      "msg": "Decimal input should have no more than 2 decimal places",
+      "input": 0.5001,
+      "ctx": {"decimal_places": 2}
+    }
+  ]
+}
+                        </div>
+                        <p class="text-gray-600 text-sm mt-2">Rich, structured error responses significantly improve developer experience and debugging.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="underlying-reasons" class="card">
+                <h2 class="text-3xl font-bold text-brand-medium mb-6 border-b pb-2">Underlying Reasons for Implementation Differences</h2>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-red-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-red-800 mb-3">Direct Code Reading (Claude) Approach</h3>
+                        <h4 class="font-medium text-gray-800 mb-2">Syntactic Translation Focus</h4>
+                        <p class="text-gray-700 mb-3">Views modernization as language translation, preserving original algorithm exactly and maintaining API contracts with high fidelity.</p>
+                        
+                        <h4 class="font-medium text-gray-800 mb-2">Preservationist Philosophy</h4>
+                        <p class="text-gray-700 mb-3">Assumes original business logic is correct, prioritizes functional equivalence over improvement, with minimal deviation from original design.</p>
+                        
+                        <h4 class="font-medium text-gray-800 mb-2">Limited Domain Understanding</h4>
+                        <p class="text-gray-700">Cannot question business logic appropriateness, lacks insight into energy billing domain norms, focuses on code replication rather than business intent.</p>
+                        
+                        <div class="mt-4 p-3 bg-red-100 rounded">
+                            <p class="text-red-800 font-medium">Outcome:</p>
+                            <p class="text-red-800">Successfully replicates the counterintuitive cost calculations from the original Java code, missing opportunities to correct potentially flawed algorithms.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-green-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-green-800 mb-3">Knowledge Graph MCP (Cursor) Approach</h3>
+                        <h4 class="font-medium text-gray-800 mb-2">Semantic Understanding</h4>
+                        <p class="text-gray-700 mb-3">Builds a knowledge graph of relationships and purposes, understands domain concepts (smart meters, energy billing), and considers business intent beyond code syntax.</p>
+                        
+                        <h4 class="font-medium text-gray-800 mb-2">Domain-Driven Modernization</h4>
+                        <p class="text-gray-700 mb-3">Questions original implementation against domain knowledge, applies energy billing best practices, and incorporates modern features (time-based pricing).</p>
+                        
+                        <h4 class="font-medium text-gray-800 mb-2">Modern Best Practices Prioritization</h4>
+                        <p class="text-gray-700">Adopts contemporary Python idioms, leverages modern framework capabilities, and implements improved validation and error handling.</p>
+                        
+                        <div class="mt-4 p-3 bg-green-100 rounded">
+                            <p class="text-green-800 font-medium">Outcome:</p>
+                            <p class="text-green-800">Fundamentally different cost calculation approach that aligns better with energy billing norms, enhanced functionality, and more intuitive billing calculations in a more maintainable codebase.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="business-impact" class="card">
+                <h2 class="text-3xl font-bold text-brand-medium mb-6 border-b pb-2">Business Impact Assessment</h2>
+                
+                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Customer Experience Impact</h3>
+                <p class="text-gray-700 mb-4">The choice of modernization approach directly influences the end-user experience, particularly in critical areas like billing and service recommendations.</p>
+                
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h4 class="font-bold text-lg mb-2 text-gray-800">Billing Logic</h4>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li><span class="font-medium">Java/Claude:</span> Counterintuitive relationships between unit rates and costs</li>
+                            <li><span class="font-medium">Cursor/MCP:</span> Expected and intuitive billing relationships</li>
+                        </ul>
+                        <p class="text-gray-600 mt-2">Cursor's approach would result in charges that align with customer expectations, significantly boosting trust and satisfaction.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h4 class="font-bold text-lg mb-2 text-gray-800">Plan Recommendations</h4>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li><span class="font-medium">Java/Claude:</span> Recommends plans with dramatically different calculated values</li>
+                            <li><span class="font-medium">Cursor/MCP:</span> Provides accurate, intuitive recommendations</li>
+                        </ul>
+                        <p class="text-gray-600 mt-2">MCP's accurate calculations empower customers with clearer understanding of potential savings.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h4 class="font-bold text-lg mb-2 text-gray-800">API Consumer Experience</h4>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li><span class="font-medium">Java/Claude:</span> Complex response structures, minimal error details</li>
+                            <li><span class="font-medium">Cursor/MCP:</span> Simple, intuitive responses with rich error details</li>
+                        </ul>
+                        <p class="text-gray-600 mt-2">Cursor's approach reduces integration costs and time-to-market for client applications.</p>
+                    </div>
+                </div>
+                
+                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Technical Debt Implications</h3>
+                <p class="text-gray-700 mb-4">Beyond immediate functionality, the modernization strategy profoundly impacts the long-term health and cost of maintaining the software.</p>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h4 class="font-bold text-lg mb-2 text-gray-800">Maintainability</h4>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li><span class="font-medium">Java/Claude:</span> Complex, potentially flawed algorithms</li>
+                            <li><span class="font-medium">Cursor/MCP:</span> Simpler, more intuitive implementations</li>
+                        </ul>
+                        <p class="text-gray-600 mt-2">Cursor's approach reduces long-term operational costs and developer onboarding time.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h4 class="font-bold text-lg mb-2 text-gray-800">Extensibility</h4>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li><span class="font-medium">Java/Claude:</span> No built-in support for variable pricing</li>
+                            <li><span class="font-medium">Cursor/MCP:</span> Includes day-of-week based pricing support</li>
+                        </ul>
+                        <p class="text-gray-600 mt-2">Cursor's implementation is better prepared for future requirements like time-of-use pricing.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h4 class="font-bold text-lg mb-2 text-gray-800">Documentation</h4>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li><span class="font-medium">Java/Claude:</span> Minimal embedded documentation</li>
+                            <li><span class="font-medium">Cursor/MCP:</span> Self-documenting models with clear field descriptions</li>
+                        </ul>
+                        <p class="text-gray-600 mt-2">Better documentation reduces learning curve and maintenance costs.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="conclusion" class="bg-brand-dark text-white rounded-lg p-8">
+                <h2 class="text-3xl font-bold mb-6 text-center">Conclusion: Modernization Strategy Recommendations</h2>
+                
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div class="bg-white/10 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold mb-3 text-blue-200">When to Choose Direct Code Reading</h3>
+                        <ul class="list-disc list-inside text-blue-100 space-y-2">
+                            <li><span class="font-medium">API Compatibility Priority:</span> When existing clients depend on exact API response structures and cannot be updated</li>
+                            <li><span class="font-medium">Risk Minimization:</span> When the primary goal is to ensure exact behavioral equivalence with the original system</li>
+                            <li><span class="font-medium">Speed of Migration:</span> When rapid modernization is required with minimal analysis time</li>
+                        </ul>
+                    </div>
+                    <div class="bg-brand-medium p-6 rounded-lg ring-4 ring-brand-accent">
+                        <h3 class="text-xl font-semibold mb-3 text-white">When to Choose Knowledge Graph MCP</h3>
+                        <ul class="list-disc list-inside text-white space-y-2">
+                            <li><span class="font-medium">Business Logic Improvement:</span> When there's an opportunity to correct potential issues in the original implementation</li>
+                            <li><span class="font-medium">Modern Best Practices:</span> When adopting contemporary coding standards and frameworks is a priority</li>
+                            <li><span class="font-medium">Enhanced Capabilities:</span> When modernization is viewed as an opportunity to add features and improvements</li>
+                            <li><span class="font-medium">Technical Debt Reduction:</span> When aiming to create a more maintainable and extensible system</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="bg-white/20 p-6 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-3 text-center text-white">Optimal Hybrid Approach</h3>
+                    <p class="text-blue-100 mb-4 text-center">A balanced modernization strategy would combine the strengths of both approaches:</p>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <ul class="list-disc list-inside text-blue-100 space-y-1">
+                            <li>Use MCP for domain understanding and to identify potential business logic improvements</li>
+                            <li>Validate proposed changes with domain experts</li>
+                            <li>Implement enhanced validation and error handling from modern frameworks</li>
+                        </ul>
+                        <ul class="list-disc list-inside text-blue-100 space-y-1">
+                            <li>Create a compatibility layer if needed to support existing API consumers</li>
+                            <li>Document the reasoning behind algorithm changes for future maintainers</li>
+                            <li>Gradually phase out compatibility layers as clients update</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <p class="mt-8 text-center text-blue-200 max-w-3xl mx-auto">This comprehensive comparison demonstrates that modernization is not merely a technical exercise but a strategic business decision. The choice between preserving original behavior versus improving domain correctness represents a fundamental trade-off that organizations must consciously evaluate based on their specific modernization goals.</p>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const wrapLabel = (str, maxWidth) => {
+                if (str.length <= maxWidth) {
+                    return str;
+                }
+                const words = str.split(' ');
+                const lines = [];
+                let currentLine = '';
+                words.forEach(word => {
+                    if ((currentLine + ' ' + word).length > maxWidth) {
+                        lines.push(currentLine.trim());
+                        currentLine = word;
+                    } else {
+                        currentLine += ' ' + word;
+                    }
+                });
+                lines.push(currentLine.trim());
+                return lines;
+            };
+
+            const tooltipTitleCallback = (tooltipItems) => {
+                const item = tooltipItems[0];
+                let label = item.chart.data.labels[item.dataIndex];
+                if (Array.isArray(label)) {
+                    return label.join(' ');
+                }
+                return label;
+            };
+
+            // Chart 1: Cost Comparison
+            const costCtx = document.getElementById('costComparisonChart');
+            if(costCtx) {
+                new Chart(costCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Price Plan 0', 'Price Plan 1', 'Price Plan 2'],
+                        datasets: [{
+                            label: wrapLabel('Direct Code Access (Flawed)', 16),
+                            data: [360.0, 72.0, 36.0],
+                            backgroundColor: 'rgba(239, 68, 68, 0.6)', /* Red */
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 1
+                        }, {
+                            label: wrapLabel('CodeConcise MCP (Corrected)', 16),
+                            data: [1.2, 2.4, 12.0],
+                            backgroundColor: 'rgba(34, 197, 94, 0.6)', /* Green */
+                            borderColor: 'rgba(34, 197, 94, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Cost Calculation Comparison (€)',
+                                font: { size: 16 }
+                            },
+                            tooltip: { callbacks: { title: tooltipTitleCallback } }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Calculated Cost (€)' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Chart 2: Quality Radar Chart
+            const qualityCtx = document.getElementById('qualityRadarChart');
+            if(qualityCtx) {
+                new Chart(qualityCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Correctness', 'Maintainability', 'Extensibility', 'API Design', 'Security'],
+                        datasets: [{
+                            label: wrapLabel('Direct Code Access', 16),
+                            data: [4, 5, 3, 4, 5],
+                            fill: true,
+                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            pointBackgroundColor: 'rgba(239, 68, 68, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(239, 68, 68, 1)'
+                        }, {
+                            label: wrapLabel('CodeConcise MCP', 16),
+                            data: [10, 9, 8, 9, 8],
+                            fill: true,
+                            backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                            borderColor: 'rgba(34, 197, 94, 1)',
+                            pointBackgroundColor: 'rgba(34, 197, 94, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(34, 197, 94, 1)'
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Modernization Quality Score (out of 10)',
+                                font: { size: 16 }
+                            },
+                             tooltip: { callbacks: { title: tooltipTitleCallback } }
+                        },
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 10,
+                                pointLabels: {
+                                    font: {
+                                        size: 14
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

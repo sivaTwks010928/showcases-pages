@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Code Refactoring: A Case Study</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+            color: #F9FAFB;
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 450px; /* Increased height for better visibility */
+            width: 100%;
+            max-width: 700px; /* Increased max-width for better visibility */
+        }
+        .stat-card {
+            background-color: #1F2937;
+            border-left: 4px solid #F7B801;
+        }
+        .flow-arrow {
+            color: #4B5563;
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #00F5D4, #F7B801);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .code-block {
+            background-color: #1F2937;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            font-size: 0.875rem;
+            color: #F9FAFB;
+            overflow-x: auto;
+        }
+        .code-header {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #F7B801;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            min-width: 1000px; /* Ensure table is wide enough for content */
+        }
+        th, td {
+            border: 1px solid #374151;
+            padding: 0.75rem;
+            text-align: left;
+            vertical-align: top; /* Align content to top for better readability */
+        }
+        th {
+            background-color: #1F2937;
+            color: #F7B801;
+            font-weight: 600;
+        }
+        td {
+            background-color: #1F2937;
+            color: #D1D5DB;
+        }
+
+        /* New styles for improved test suite visualization */
+        .test-suite-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .test-category {
+            background-color: #1F2937;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .test-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background-color: #374151;
+            cursor: pointer;
+        }
+        
+        .test-category-title {
+            font-weight: 600;
+            color: white;
+            font-size: 1.1rem;
+        }
+        
+        .test-category-count {
+            background-color: #111827;
+            color: #F7B801;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .test-category-content {
+            padding: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .test-case {
+            background-color: #374151;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.9rem;
+            color: #E5E7EB;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .test-case:before {
+            content: "✓";
+            color: #10B981;
+            font-weight: bold;
+        }
+        
+        .test-suite-summary {
+            display: flex;
+            justify-content: space-between;
+            background-color: #1F2937;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .summary-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-label {
+            color: #9CA3AF;
+            font-size: 0.9rem;
+        }
+        
+        .chart-container {
+            margin-top: 2rem;
+        }
+
+        /* New styles for improved test suite list visualization */
+        .test-suite-item {
+            background-color: #1F2937;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        .test-count {
+            background-color: #111827;
+            color: #F7B801;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .test-progress-bar {
+            height: 6px;
+            background-color: #374151;
+            border-radius: 3px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .test-progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #00F5D4, #F7B801);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <p class="text-gray-500 text-sm mb-2 text-center">AI Agent Used: <span class="font-bold text-white">Cursor</span>, Used LLM Model: <span class="font-bold text-white">Claude Sonnet 4</span></p>
+
+    <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+
+        <header class="text-center my-12">
+            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight">
+                <span class="gradient-text">The AI Refactoring Revolution</span>
+            </h1>
+            <p class="mt-4 text-lg md:text-xl text-gray-400 max-w-3xl mx-auto">A case study on proactively leveraging AI agents for recurring code review and refactoring, significantly reducing manual effort for small-to-medium changes, and enhancing overall code quality.</p>
+        </header>
+
+        <section id="challenge" class="my-16">
+            <h2 class="text-3xl font-bold text-center mb-8">The Opportunity: Automating Code Refactoring</h2>
+            <p class="text-center text-gray-400 max-w-2xl mx-auto mb-12">Instead of daily manual code reviews and refactorings, our team explored how an LLM-powered AI agent could automate these recurring tasks, allowing human developers to focus on architectural and complex changes.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
+                <div class="stat-card p-8 rounded-lg shadow-2xl">
+                    <p class="text-6xl font-black text-white">528</p>
+                    <p class="mt-2 text-lg text-gray-300">Total Lines of Code Refactored</p>
+                </div>
+                <div class="stat-card p-8 rounded-lg shadow-2xl">
+                    <p class="text-6xl font-black text-white">200+</p>
+                    <p class="mt-2 text-lg text-gray-300">Lines in the Monolithic Function</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="initial-rules" class="my-24">
+            <h2 class="text-3xl font-bold text-center mb-12">Initial Refactoring Rules for the AI Agent</h2>
+            <p class="text-center text-gray-400 max-w-3xl mx-auto mb-8">The AI agent was provided with a set of initial guidelines to direct its refactoring efforts on the `openai_api_request_parallel_processor.py` module:</p>
+            <div class="p-8 bg-gray-800 rounded-lg shadow-2xl">
+                <ol class="list-decimal list-inside space-y-4 text-gray-300">
+                    <li><span class="font-semibold text-white">Avoid defensive programming where possible:</span> Let errors surface naturally to aid debugging.</li>
+                    <li><span class="font-semibold text-white">Use list comprehensions over for loops:</span> For better readability and performance.</li>
+                    <li><span class="font-semibold text-white">Prefer map/reduce for complex iterations:</span> To enhance performance and clarity.</li>
+                    <li><span class="font-semibold text-white">Eliminate magic strings:</span> Unless they improve readability and are naturally intuitive.</li>
+                    <li><span class="font-semibold text-white">Identify and eliminate code smells:</span> Always refactor to improve structure, clarity, and maintainability.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="journey" class="my-24">
+            <h2 class="text-3xl font-bold text-center mb-12">A Four-Phase Transformation Journey</h2>
+            <div class="flex flex-col md:flex-row items-center justify-center space-y-8 md:space-y-0 md:space-x-8">
+                <div class="text-center">
+                    <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 w-52 h-32 flex items-center justify-center">
+                        <div>
+                            <p class="font-bold text-lg text-white">Phase 1</p>
+                            <p class="text-gray-400">Initial Refactor</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-5xl font-thin flow-arrow transform md:rotate-0 rotate-90">&rarr;</div>
+                <div class="text-center">
+                    <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 w-52 h-32 flex items-center justify-center">
+                        <div>
+                            <p class="font-bold text-lg text-white">Phase 2</p>
+                            <p class="text-gray-400">Bug Discovery</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-5xl font-thin flow-arrow transform md:rotate-0 rotate-90">&rarr;</div>
+                <div class="text-center">
+                    <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 w-52 h-32 flex items-center justify-center">
+                        <div>
+                            <p class="font-bold text-lg text-white">Phase 3</p>
+                            <p class="text-gray-400">Resolution</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-5xl font-thin flow-arrow transform md:rotate-0 rotate-90">&rarr;</div>
+                <div class="text-center">
+                    <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 w-52 h-32 flex items-center justify-center">
+                        <div>
+                            <p class="font-bold text-lg text-white">Phase 4</p>
+                            <p class="text-gray-400">Full Validation</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture" class="my-24">
+            <h2 class="text-3xl font-bold text-center mb-12">Architectural Shift: From Monolith to Modular</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="p-6 bg-gray-800 rounded-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-red-400">Before</h3>
+                    <p class="text-center text-gray-400 mb-6">A single, massive 200+ line function handled everything, making it brittle and hard to change.</p>
+                    <div class="bg-red-900/50 border-2 border-dashed border-red-500 rounded-lg p-8 min-h-[200px] flex items-center justify-center">
+                        <span class="text-xl font-semibold text-red-300">process_api_requests_from_file()</span>
+                    </div>
+                </div>
+                <div class="p-6 bg-gray-800 rounded-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-teal-400">After</h3>
+                    <p class="text-center text-gray-400 mb-6">The logic was decomposed into five focused, reusable classes, promoting a clean separation of concerns.</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-teal-900/50 border border-teal-500 rounded p-3 text-center text-teal-200">RateLimitConfig</div>
+                        <div class="bg-teal-900/50 border border-teal-500 rounded p-3 text-center text-teal-200">CapacityTracker</div>
+                        <div class="bg-teal-900/50 border border-teal-500 rounded p-3 text-center text-teal-200">RequestProcessor</div>
+                        <div class="bg-teal-900/50 border border-teal-500 rounded p-3 text-center text-teal-200">APIRequest</div>
+                        <div class="bg-teal-900/50 border border-teal-500 rounded p-3 text-center text-teal-200">StatusTracker</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="bugs" class="my-24">
+            <h2 class="text-3xl font-bold text-center mb-2">The Critical Role of Testing: Uncovering Hidden Bugs</h2>
+            <p class="text-center text-gray-400 max-w-3xl mx-auto mb-12">Initial AI refactoring introduced critical bugs that broke core functionality. Comprehensive testing, guided by human intuition ("Something is not right..."), was essential for detection and resolution.</p>
+            
+            <h3 class="text-2xl font-bold text-center mb-8 text-red-400">Detailed Analysis: Critical Bugs Introduced</h3>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h4 class="text-xl font-bold mb-4">🐛 Bug 1: Broken Retry Logic</h4>
+                    <p class="text-gray-400 mb-4">The AI mistakenly created a new retry queue for each request instead of utilizing a single shared queue. This led to failed requests never being retried.</p>
+                    
+                    <p class="code-header">Original Working Code Snippet:</p>
+                    <pre class="code-block"><code>async def process_api_requests_from_file(...):
+    # Single shared retry queue for ALL requests
+    retry_queue = asyncio.Queue()
+    # ...
+    while not status_tracker.complete:
+        request = await retry_queue.get()
+        await request.call_api(retry_queue=retry_queue, ...)  # ✅ Shared queue</code></pre>
+
+                    <p class="code-header mt-6">Initial Refactored Code (BROKEN) Snippet:</p>
+                    <pre class="code-block"><code>class RequestProcessor:
+    async def _try_process_request(self, request: APIRequest, ...):
+        # 🚨 BUG: Created NEW queue for EACH request!
+        retry_queue = asyncio.Queue()  # ❌ Individual queue per request
+        
+        await request.call_api(
+            retry_queue=retry_queue,  # ❌ Each request gets isolated queue
+            ...
+        )</code></pre>
+
+                    <p class="text-lg font-semibold text-white mt-6">The Critical Difference:</p>
+                    <ul class="list-disc list-inside text-gray-400 space-y-1">
+                        <li><span class="font-medium text-white">Original:</span> One shared `retry_queue` for all requests &rarr; Failed requests go back to shared pool for retry.</li>
+                        <li><span class="font-medium text-white">Broken:</span> Each request gets its own `retry_queue` &rarr; Failed requests go to isolated queue that's never processed again.</li>
+                    </ul>
+                    <p class="text-lg font-semibold text-white mt-4">Real Impact:</p>
+                    <p class="text-gray-400">Expected: 3 requests, some fail, get retried. Original: 3 requests &rarr; 2 fail &rarr; retry &rarr; total 6+ API calls. Broken: 3 requests &rarr; 2 fail &rarr; NO RETRY &rarr; total 3 API calls only.</p>
+                    <div class="chart-container mt-6">
+                        <canvas id="retryLogicChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h4 class="text-xl font-bold mb-4">🐛 Bug 2: Broken Rate Limiting</h4>
+                    <p class="text-gray-400 mb-4">A crucial sleep interval was removed, causing requests to be processed immediately without respecting API limits, leading to potential service throttling or bans.</p>
+
+                    <p class="code-header">Original Working Code Snippet:</p>
+                    <pre class="code-block"><code>async def process_api_requests_from_file(...):
+    seconds_to_sleep_each_loop = 1 / max_requests_per_minute * 60
+    # ...
+    while True:
+        await process_single_request(...)
+        # 🔑 CRITICAL: Sleep between each request for rate limiting
+        await asyncio.sleep(seconds_to_sleep_each_loop)  # ✅ Rate limiting enforced</code></pre>
+
+                    <p class="code-header mt-6">Initial Refactored Code (BROKEN) Snippet:</p>
+                    <pre class="code-block"><code>class RequestProcessor:
+    async def process_requests(self, ...):
+        async for request in self._read_requests(...):
+            if self.capacity_tracker.can_process_request(request.token_consumption):
+                await self._try_process_request(request, ...)
+                # 🚨 BUG: NO SLEEP! Missing rate limiting delay
+            # Loop continues immediately to next request</code></pre>
+
+                    <p class="text-lg font-semibold text-white mt-6">The Critical Difference:</p>
+                    <ul class="list-disc list-inside text-gray-400 space-y-1">
+                        <li><span class="font-medium text-white">Original:</span> Explicit `await asyncio.sleep()` between each request &rarr; Enforced rate limiting.</li>
+                        <li><span class="font-medium text-white">Broken:</span> No sleep delays &rarr; All requests processed as fast as possible.</li>
+                    </ul>
+                    <p class="text-lg font-semibold text-white mt-4">Real Impact:</p>
+                    <p class="text-gray-400">Expected: 0.5 requests/second. Original: 5 requests take ~10 seconds. Broken: 5 requests take ~0.05 seconds. Rate measurement: Original: 0.5 requests/second ✅. Broken: 98.5 requests/second ❌ (196x faster than intended!).</p>
+                    <div class="chart-container mt-6">
+                        <canvas id="rateLimitChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="text-2xl font-bold text-center mb-8">How These Bugs Were Hidden Initially</h3>
+            <p class="text-center text-gray-400 max-w-3xl mx-auto mb-8">These critical issues weren't immediately obvious because the refactored code compiled, ran, and basic functionality appeared intact. Only deep behavioral testing revealed the underlying flaws.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h4 class="text-xl font-bold mb-4 text-white">Why Hidden:</h4>
+                    <ul class="list-disc list-inside text-gray-400 space-y-2">
+                        <li>The refactored code compiled and ran without errors.</li>
+                        <li>Basic functionality appeared to work (requests were sent, responses received).</li>
+                        <li>The architectural improvements were real (better structure, cleaner code).</li>
+                        <li>Only deep behavioral testing revealed the issues.</li>
+                    </ul>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h4 class="text-xl font-bold mb-4 text-white">Why Critical:</h4>
+                    <ul class="list-disc list-inside text-gray-400 space-y-2">
+                        <li><span class="font-medium text-white">Retry Logic Failure:</span> In production with API failures &rarr; Requests would be lost instead of retried, leading to data loss and reliability issues.</li>
+                        <li><span class="font-medium text-white">Rate Limiting Failure:</span> Would immediately hit API rate limits and get blocked, potentially resulting in service bans or throttling.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 class="text-2xl font-bold text-center mt-12 mb-8">Key Lesson</h3>
+            <p class="text-center text-gray-400 max-w-3xl mx-auto">The initial refactoring was a classic example of: <span class="font-bold text-white">"Making the code better structured but breaking the actual functionality."</span> This highlights why comprehensive testing BEFORE and AFTER refactoring is critical. The AI agent improved the code architecture but accidentally broke the core business logic during the restructuring process. The bugs were <span class="font-bold text-white">subtle but devastating</span> - the kind that would pass basic testing but cause major issues in production with real API usage patterns.</p>
+
+        </section>
+        
+        <section id="outcomes" class="my-24">
+            <h2 class="text-3xl font-bold text-center mb-12">Test Suite Composition</h2>
+            
+            <div class="bg-gray-800 rounded-lg shadow-lg p-6">
+                <div class="flex flex-col md:flex-row gap-8">
+                    <!-- Test Suite List -->
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold mb-4 text-teal-400">Test Suites Breakdown</h3>
+                        <div class="space-y-4">
+                            <!-- Utility Functions -->
+                            <div class="p-4 bg-gray-700 rounded-lg">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium">Utility Functions</span>
+                                    <span class="px-3 py-1 bg-gray-900 text-yellow-400 rounded-full text-sm font-semibold">6 tests</span>
+                                </div>
+                                <div class="h-1.5 bg-gray-600 rounded-full mt-2 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-teal-400 to-yellow-400 rounded-full" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Data Classes -->
+                            <div class="p-4 bg-gray-700 rounded-lg">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium">Data Classes</span>
+                                    <span class="px-3 py-1 bg-gray-900 text-yellow-400 rounded-full text-sm font-semibold">2 tests</span>
+                                </div>
+                                <div class="h-1.5 bg-gray-600 rounded-full mt-2 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-teal-400 to-yellow-400 rounded-full" style="width: 28%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Main Functionality -->
+                            <div class="p-4 bg-gray-700 rounded-lg">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium">Main Functionality</span>
+                                    <span class="px-3 py-1 bg-gray-900 text-yellow-400 rounded-full text-sm font-semibold">7 tests</span>
+                                </div>
+                                <div class="h-1.5 bg-gray-600 rounded-full mt-2 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-teal-400 to-yellow-400 rounded-full" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- API Request -->
+                            <div class="p-4 bg-gray-700 rounded-lg">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium">API Request</span>
+                                    <span class="px-3 py-1 bg-gray-900 text-yellow-400 rounded-full text-sm font-semibold">4 tests</span>
+                                </div>
+                                <div class="h-1.5 bg-gray-600 rounded-full mt-2 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-teal-400 to-yellow-400 rounded-full" style="width: 57%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Capacity Tracker -->
+                            <div class="p-4 bg-gray-700 rounded-lg">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium">Capacity Tracker</span>
+                                    <span class="px-3 py-1 bg-gray-900 text-yellow-400 rounded-full text-sm font-semibold">5 tests</span>
+                                </div>
+                                <div class="h-1.5 bg-gray-600 rounded-full mt-2 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-teal-400 to-yellow-400 rounded-full" style="width: 71%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Request Processor -->
+                            <div class="p-4 bg-gray-700 rounded-lg">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium">Request Processor</span>
+                                    <span class="px-3 py-1 bg-gray-900 text-yellow-400 rounded-full text-sm font-semibold">3 tests</span>
+                                </div>
+                                <div class="h-1.5 bg-gray-600 rounded-full mt-2 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-teal-400 to-yellow-400 rounded-full" style="width: 42%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Edge Cases -->
+                            <div class="p-4 bg-gray-700 rounded-lg">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium">Edge Cases</span>
+                                    <span class="px-3 py-1 bg-gray-900 text-yellow-400 rounded-full text-sm font-semibold">2 tests</span>
+                                </div>
+                                <div class="h-1.5 bg-gray-600 rounded-full mt-2 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-teal-400 to-yellow-400 rounded-full" style="width: 28%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 p-4 bg-gray-700 rounded-lg">
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm font-medium">Total Test Coverage</span>
+                                <span class="text-sm font-bold">29 tests</span>
+                            </div>
+                            <div class="w-full bg-gray-600 rounded-full h-2.5">
+                                <div class="bg-gradient-to-r from-teal-400 to-yellow-400 h-2.5 rounded-full" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Visualization -->
+                    <div class="flex-1 flex items-center justify-center">
+                        <div class="w-full max-w-md">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-gradient-to-br from-teal-600 to-teal-800 p-4 rounded-lg">
+                                    <div class="text-3xl font-bold text-center text-white">6</div>
+                                    <div class="text-sm text-center text-teal-200">Utility</div>
+                                </div>
+                                <div class="bg-gradient-to-br from-yellow-600 to-yellow-800 p-4 rounded-lg">
+                                    <div class="text-3xl font-bold text-center text-white">7</div>
+                                    <div class="text-sm text-center text-yellow-200">Main</div>
+                                </div>
+                                <div class="bg-gradient-to-br from-orange-600 to-orange-800 p-4 rounded-lg">
+                                    <div class="text-3xl font-bold text-center text-white">5</div>
+                                    <div class="text-sm text-center text-orange-200">Capacity</div>
+                                </div>
+                                <div class="bg-gradient-to-br from-red-600 to-red-800 p-4 rounded-lg">
+                                    <div class="text-3xl font-bold text-center text-white">4</div>
+                                    <div class="text-sm text-center text-red-200">API</div>
+                                </div>
+                                <div class="bg-gradient-to-br from-purple-600 to-purple-800 p-4 rounded-lg">
+                                    <div class="text-3xl font-bold text-center text-white">3</div>
+                                    <div class="text-sm text-center text-purple-200">Processor</div>
+                                </div>
+                                <div class="bg-gradient-to-br from-blue-600 to-blue-800 p-4 rounded-lg">
+                                    <div class="text-3xl font-bold text-center text-white">2</div>
+                                    <div class="text-sm text-center text-blue-200">Edge Cases</div>
+                                </div>
+                                <div class="bg-gradient-to-br from-green-600 to-green-800 p-4 rounded-lg">
+                                    <div class="text-3xl font-bold text-center text-white">2</div>
+                                    <div class="text-sm text-center text-green-200">Data Classes</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="full-comparison" class="my-24">
+            <h2 class="text-3xl font-bold text-center mb-12">📊 Realistic Manual vs AI Agent Refactoring (Skilled Professional Developer)</h2>
+            <p class="text-center text-gray-400 max-w-3xl mx-auto mb-8">A detailed breakdown comparing the outcomes and efforts of manual refactoring versus the AI-assisted approach, considering real-world human behavior.</p>
+            <div class="overflow-x-auto bg-gray-800 rounded-lg shadow-lg p-4">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Section</th>
+                            <th>Aspect</th>
+                            <th>Manual Refactoring (Skilled Developer)</th>
+                            <th>AI Agent Refactoring (Claude Sonnet 3.5)</th>
+                            <th>Verdict</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Time and Scope</td>
+                            <td>Time Taken</td>
+                            <td>2-3 hours (focused, methodical approach)</td>
+                            <td>45 mins total (15 mins refactor + 20 mins bug fix + 10 mins test creation)</td>
+                            <td>AI Agent</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Functionality Preservation</td>
+                            <td>Excellent (incremental changes, tested at each step)</td>
+                            <td>Initially broke 2 critical bugs, fixed after testing</td>
+                            <td>Manual</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Scope Completion</td>
+                            <td>Complete (professional standards)</td>
+                            <td>Complete systematic refactoring</td>
+                            <td>Both</td>
+                        </tr>
+                        <tr>
+                            <td>Functional Programming</td>
+                            <td>No mutable operations</td>
+                            <td>Well applied (knows when and how to use FP)</td>
+                            <td>Fully removed systematically</td>
+                            <td>Both</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Use functional programming</td>
+                            <td>Strategic use (applies where it adds value)</td>
+                            <td>Strong adherence</td>
+                            <td>Both</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Asynchronous Efficiency</td>
+                            <td>Optimized (understands async patterns well)</td>
+                            <td>Enhanced patterns</td>
+                            <td>Both</td>
+                        </tr>
+                        <tr>
+                            <td>SOLID Principles</td>
+                            <td>SRP: One purpose per class/function</td>
+                            <td>Thoughtfully applied (balances purity with practicality)</td>
+                            <td>Systematic decomposition</td>
+                            <td>Both</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Inject dependencies</td>
+                            <td>Properly implemented (knows the benefits)</td>
+                            <td>Full dependency injection</td>
+                            <td>Both</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Code extensible without modification</td>
+                            <td>Well architected (anticipates future needs)</td>
+                            <td>Complete modularization</td>
+                            <td>Manual</td>
+                        </tr>
+                        <tr>
+                            <td>Code Quality</td>
+                            <td>Replace magic strings/numbers</td>
+                            <td>Thorough extraction (catches all important ones)</td>
+                            <td>Complete extraction (systematic but may over-extract)</td>
+                            <td>Manual</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Type hints and return types</td>
+                            <td>Comprehensive typing (professional practice)</td>
+                            <td>Comprehensive type annotations</td>
+                            <td>Both</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Error handling patterns</td>
+                            <td>Contextual decisions (knows when defensive is needed)</td>
+                            <td>Consistent non-defensive approach</td>
+                            <td>Manual</td>
+                        </tr>
+                        <tr>
+                            <td>Architecture</td>
+                            <td>Class design</td>
+                            <td>Business-aligned design (understands domain deeply)</td>
+                            <td>Clean technical design (may miss business nuances)</td>
+                            <td>Manual</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Separation of concerns</td>
+                            <td>Domain-driven boundaries</td>
+                            <td>Technical boundaries</td>
+                            <td>Manual</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Code reusability</td>
+                            <td>Strategic reusability (balances current vs future needs)</td>
+                            <td>Highly reusable components</td>
+                            <td>Manual</td>
+                        </tr>
+                        <tr>
+                            <td>Testing Requirements</td>
+                            <td>Create comprehensive tests</td>
+                            <td>Excellent coverage (writes tests first or alongside)</td>
+                            <td>29 comprehensive tests immediately</td>
+                            <td>AI Agent</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Test coverage</td>
+                            <td>Focused coverage (critical paths + known edge cases)</td>
+                            <td>Exhaustive coverage (all possible scenarios)</td>
+                            <td>AI Agent</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Test organization</td>
+                            <td>Well-structured (follows established patterns)</td>
+                            <td>Professional structure</td>
+                            <td>Both</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Mock testing capabilities</td>
+                            <td>Appropriate mocking (mocks what should be mocked)</td>
+                            <td>Advanced mocking capabilities</td>
+                            <td>Both</td>
+                        </tr>
+                        <tr>
+                            <td>Domain Understanding</td>
+                            <td>Business logic comprehension</td>
+                            <td>Deep contextual understanding</td>
+                            <td>Pattern-based understanding</td>
+                            <td>Manual</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Future requirements anticipation</td>
+                            <td>Strategic foresight (based on experience)</td>
+                            <td>Current scope focus</td>
+                            <td>Manual</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Performance implications</td>
+                            <td>Production-aware decisions</td>
+                            <td>Generic optimizations</td>
+                            <td>Manual</td>
+                        </tr>
+                        <tr>
+                            <td>Risk Management</td>
+                            <td>Functionality preservation</td>
+                            <td>Careful, tested increments</td>
+                            <td>Comprehensive testing after changes</td>
+                            <td>Manual</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Bug detection</td>
+                            <td>Proactive prevention + good testing</td>
+                            <td>Systematic detection through testing</td>
+                            <td>Both</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Recovery from issues</td>
+                            <td>Quick debugging (domain + technical knowledge)</td>
+                            <td>Methodical systematic debugging</td>
+                            <td>Both</td>
+                        </tr>
+                        <tr>
+                            <td>Execution Quality</td>
+                            <td>Consistency</td>
+                            <td>Reliable professional quality</td>
+                            <td>Perfectly consistent quality</td>
+                            <td>AI Agent</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Focus & Thoroughness</td>
+                            <td>Disciplined thoroughness</td>
+                            <td>Complete systematic approach</td>
+                            <td>AI Agent</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Speed on repetitive tasks</td>
+                            <td>Efficient but still takes time</td>
+                            <td>Instant systematic execution</td>
+                            <td>AI Agent</td>
+                        </tr>
+                        <tr>
+                            <td>Strategic Approach</td>
+                            <td>Boring/repetitive tasks</td>
+                            <td>Does them but takes time</td>
+                            <td>Excels at systematic repetitive work</td>
+                            <td>AI Agent</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Complex decision making</td>
+                            <td>Excellent judgment</td>
+                            <td>Needs human guidance</td>
+                            <td>Manual</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Creative problem solving</td>
+                            <td>Strong creative solutions</td>
+                            <td>Pattern-based solutions</td>
+                            <td>Manual</td>
+                        </tr>
+                        <tr>
+                            <td>Output Quality</td>
+                            <td>Final code maintainability</td>
+                            <td>Pretty good (when developer cares)</td>
+                            <td>Excellent structure</td>
+                            <td>AI Agent</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>All tests pass</td>
+                            <td>"It works on my machine" ¯\_(ツ)_/¯</td>
+                            <td>✅ Comprehensive validation</td>
+                            <td>AI Agent</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Production readiness</td>
+                            <td>"Probably fine" (fingers crossed)</td>
+                            <td>Thoroughly tested after initial fixes</td>
+                            <td>AI Agent</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <h3 class="text-2xl font-bold text-center mt-12 mb-8">🎯 Strategic Verdict Summary</h3>
+            <div class="overflow-x-auto bg-gray-800 rounded-lg shadow-lg p-4">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Best Approach</th>
+                            <th>Reasoning</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Architecture & Design Decisions</td>
+                            <td>Manual</td>
+                            <td>Requires business context and strategic thinking</td>
+                        </tr>
+                        <tr>
+                            <td>Systematic Implementation</td>
+                            <td>AI Agent</td>
+                            <td>Faster, more thorough on repetitive technical tasks</td>
+                        </tr>
+                        <tr>
+                            <td>Testing Creation</td>
+                            <td>AI Agent</td>
+                            <td>Comprehensive coverage of all scenarios</td>
+                        </tr>
+                        <tr>
+                            <td>Risk-Critical Changes</td>
+                            <td>Manual</td>
+                            <td>Better safety through incremental approach</td>
+                        </tr>
+                        <tr>
+                            <td>Boring/Repetitive Tasks</td>
+                            <td>AI Agent</td>
+                            <td>Faster execution of systematic work</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <h3 class="text-2xl font-bold text-center mt-12 mb-8">🏆 Optimal Strategy for Skilled Developer</h3>
+            <p class="text-center text-gray-400 max-w-3xl mx-auto mb-4">"Strategic Hybrid Approach: Right Tool for Right Task"</p>
+            <p class="text-center text-gray-400 max-w-3xl mx-auto mb-4 font-bold">The Truth:</p>
+            <ul class="list-disc list-inside text-gray-400 max-w-3xl mx-auto space-y-2 mb-6">
+                <li><span class="font-semibold text-white">Humans are great at:</span> Understanding business context, making pragmatic trade-offs, creative problem-solving, knowing when "good enough" is actually good enough.</li>
+                <li><span class="font-semibold text-white">Humans are terrible at:</span> Consistent thoroughness, systematic application of best practices, comprehensive testing, staying focused for long periods.</li>
+                <li><span class="font-semibold text-white">AI Agent is great at:</span> Systematic improvements, comprehensive testing, consistent quality, uninterrupted focus.</li>
+                <li><span class="font-semibold text-white">AI Agent is terrible at:</span> Understanding business context, making pragmatic trade-offs, knowing when to break rules.</li>
+            </ul>
+            <p class="text-center text-gray-400 max-w-3xl mx-auto mb-4 font-bold">Best Real-World Approach:</p>
+            <ol class="list-decimal list-inside text-gray-400 max-w-3xl mx-auto space-y-2">
+                <li><span class="font-semibold text-white">Human:</span> Plan architecture, identify refactoring scope.</li>
+                <li><span class="font-semibold text-white">AI Agent:</span> Execute systematic improvements + create comprehensive tests.</li>
+                <li><span class="font-semibold text-white">Human:</span> Review for business logic correctness, adjust for context.</li>
+                <li><span class="font-semibold text-white">AI Agent:</span> Handle any remaining repetitive cleanup tasks.</li>
+                <li><span class="font-semibold text-white">Human:</span> Final validation and production readiness check.</li>
+            </ol>
+            <p class="text-center text-gray-400 max-w-3xl mx-auto mt-6 font-bold">Bottom Line:</p>
+            <p class="text-center text-gray-400 max-w-3xl mx-auto">Most humans (including skilled ones) cut corners due to time pressure, distractions, and "good enough" mentality. AI agents do systematic, thorough work but lack context. Use both strategically.</p>
+        </section>
+
+        <footer class="text-center mt-16 mb-8">
+            <p class="text-gray-500">This case study demonstrates the powerful potential of guided AI to accelerate development, improve code quality, and free up human developers for high-value strategic work.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const tooltipCallback = {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                              return label.join(' ');
+                            } else {
+                              return label;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        function wrapLabel(label, maxWidth) {
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                if ((currentLine + ' ' + word).length > maxWidth) {
+                    lines.push(currentLine);
+                    currentLine = word;
+                } else {
+                    currentLine = currentLine ? currentLine + ' ' + word : word;
+                }
+            }
+            lines.push(currentLine);
+            return lines;
+        }
+
+        const energeticPalette = {
+            teal: '#00F5D4',
+            darkTeal: '#00B9AE',
+            yellow: '#F7B801',
+            orange: '#F18701',
+            darkOrange: '#F35B04',
+            red: '#EF4444',
+            green: '#22C55E',
+            gray: '#6B7280'
+        };
+
+        const chartFontColor = '#F9FAFB';
+
+        new Chart(document.getElementById('rateLimitChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Before Fix', 'After Fix'],
+                datasets: [{
+                    label: 'Requests per Second',
+                    data: [98.5, 0.5],
+                    backgroundColor: [energeticPalette.red, energeticPalette.green],
+                    borderColor: ['#B91C1C', '#14532D'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                ...tooltipCallback,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        type: 'logarithmic',
+                        ticks: { color: chartFontColor, font: { weight: '500' } },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    },
+                    x: {
+                        ticks: { color: chartFontColor, font: { size: 14, weight: '600' } },
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                     ...tooltipCallback.plugins,
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('retryLogicChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Before Fix', 'After Fix'],
+                datasets: [{
+                    label: 'API Calls for 3 Failed Requests',
+                    data: [3, 6],
+                    backgroundColor: [energeticPalette.red, energeticPalette.green],
+                    borderColor: ['#B91C1C', '#14532D'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                ...tooltipCallback,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: chartFontColor, stepSize: 1, font: { weight: '500' } },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    },
+                    x: {
+                        ticks: { color: chartFontColor, font: { size: 14, weight: '600' } },
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    ...tooltipCallback.plugins,
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Test Suite Chart (Radar Chart)
+        new Chart(document.getElementById('testSuiteChart'), {
+            type: 'radar',
+            data: {
+                labels: [
+                    'Utility Functions',
+                    'Data Classes',
+                    'Main Functionality',
+                    'API Request',
+                    'Capacity Tracker',
+                    'Request Processor',
+                    'Edge Cases'
+                ],
+                datasets: [{
+                    label: 'Test Coverage',
+                    data: [6, 2, 7, 4, 5, 3, 2],
+                    backgroundColor: 'rgba(0, 245, 212, 0.2)',
+                    borderColor: '#00F5D4',
+                    pointBackgroundColor: '#F7B801',
+                    pointBorderColor: '#fff',
+                    pointHoverRadius: 8,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: {
+                            color: '#374151'
+                        },
+                        grid: {
+                            color: '#374151'
+                        },
+                        pointLabels: {
+                            color: '#E5E7EB',
+                            font: {
+                                size: 12
+                            }
+                        },
+                        ticks: {
+                            display: false,
+                            backdropColor: 'transparent'
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 8
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.raw} tests`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Add interactivity to test categories
+        document.querySelectorAll('.test-category-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                content.style.display = content.style.display === 'none' ? 'flex' : 'none';
+            });
+            
+            // Start with all categories expanded
+            header.nextElementSibling.style.display = 'flex';
+        });
+    </script>
+</body>
+</html>
